@@ -1,4 +1,4 @@
-import type { Label} from "@/types/categories";
+import type { Label } from "@/types/categories";
 import { Close } from "@mui/icons-material";
 import { Dialog, DialogTitle } from "@mui/material";
 import React, {
@@ -9,15 +9,24 @@ import React, {
   useEffect,
   useRef,
 } from "react";
+import { useDispatch } from "react-redux";
+import { addTask } from "./Store/store";
 interface props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  CategoryName: string;
 }
-const TaskDialog: FC<props> = ({ open, setOpen }) => {
+export const LabelcolorVariant = {
+  blue: "bg-blue-300 border-blue-500 text-blue-900",
+  purple: "bg-purple-300 border-purple-500 text-purple-900",
+  green: "bg-green-300 border-green-500 text-green-900",
+};
+const TaskDialog: FC<props> = ({ open, setOpen, CategoryName }) => {
   const [selectedLabelColor, setSelectedLabelColor] = useState<string>("green");
   const [label, setLabel] = useState<string>("");
+  const Dispatch = useDispatch();
 
-  const [severity, setSeverity] = useState<string>("");
+  const [severity, setSeverity] = useState<string>("low");
   const [description, setDescription] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [labelError, setLabelError] = useState<string>("");
@@ -41,21 +50,37 @@ const TaskDialog: FC<props> = ({ open, setOpen }) => {
       }
     };
   }, [setLabelError, label]);
-  const handleTask = (e: React.FormEvent) => {
-    e.preventDefault();
-    setOpen(false);
+  const handleTask = () => {
+    if (title !== "" && description !== "") {
+      const newTask = {
+        issue_number: Math.floor(Math.random() * 1000).toString(),
+        issue_date: new Intl.DateTimeFormat("en-US", {
+          day: "numeric",
+          month: "short",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        }).format(new Date()),
+        issue_title: title,
+        verified: true,
+        severity: severity,
+        description: description,
+        label: allLabels,
+      };
+      Dispatch(addTask({ checkCategory: CategoryName, task: newTask }));
+      setOpen(false);
+      setDescription("");
+      setTitle("");
+      setAllLabels([]);
+    }
   };
-  const LabelcolorVariant = {
-    blue: "bg-blue-300 border-blue-500 text-blue-900",
-    purple: "bg-purple-300 border-purple-500 text-purple-900",
-    green: "bg-green-300 border-green-500 text-green-900",
-  };
+
   const handleLabels = () => {
     if (label !== "") {
       if (label.length >= 15) {
         setLabelError("Label character limit: 15");
       } else {
-        if (allLabels.find((x) => x.name !== label)) {
+        if (!allLabels.find((x) => x.name === label)) {
           setAllLabels((prev) => [
             ...prev,
             { name: label, color: selectedLabelColor },
@@ -75,10 +100,7 @@ const TaskDialog: FC<props> = ({ open, setOpen }) => {
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
       <DialogTitle>Create Task</DialogTitle>
-      <form
-        className="flex w-[450px] flex-col gap-2 px-4 pb-4"
-        onSubmit={handleTask}
-      >
+      <div className="flex w-[450px] flex-col gap-2 px-4 pb-4">
         <label htmlFor="title">
           Title<span className="text-red-600">*</span>:
         </label>
@@ -197,11 +219,11 @@ const TaskDialog: FC<props> = ({ open, setOpen }) => {
         </div>
         <button
           className="self-end rounded-lg bg-sky-400 px-2 py-1"
-          type="submit"
+          onClick={handleTask}
         >
           Create
         </button>
-      </form>
+      </div>
     </Dialog>
   );
 };

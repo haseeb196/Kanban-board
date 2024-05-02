@@ -17,18 +17,16 @@ const categorySlice = createSlice({
     },
     addTask(
       state,
-      action: PayloadAction<{ categoryName: string; task: Task }>,
+      action: PayloadAction<{ checkCategory: string; task: Task }>,
     ) {
-      const { categoryName, task } = action.payload;
+      const { checkCategory, task } = action.payload;
 
       const categoryToUpdate = state.find(
-        (category: Category) => category.name === categoryName,
+        (category: Category) => category.name === checkCategory,
       );
       if (categoryToUpdate) {
         categoryToUpdate.tasks = categoryToUpdate.tasks ?? [];
         categoryToUpdate.tasks.push(task);
-      } else {
-        console.error(`Category '${categoryName}' not found`);
       }
     },
   },
