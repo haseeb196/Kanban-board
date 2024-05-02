@@ -1,6 +1,6 @@
 import { Circle, Stars, Verified } from "@mui/icons-material";
 
-const Task = () => {
+const Tasks = () => {
   return (
     <div className="rounded-lg border-[1px] border-gray-200 px-2 py-2 font-medium shadow-sm">
       <div className="flex items-center justify-between text-[12px] text-gray-400">
@@ -29,4 +29,4 @@ const Task = () => {
   );
 };
 
-export default Task;
+export default Tasks;

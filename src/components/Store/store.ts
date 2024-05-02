@@ -1,5 +1,5 @@
 // store.ts
-import type { Category } from "@/types/categories";
+import type { Category, Task } from "@/types/categories";
 import {
   configureStore,
   createSlice,
@@ -12,13 +12,29 @@ const categorySlice = createSlice({
   name: "categories",
   initialState,
   reducers: {
-    addCategory: (state, action: PayloadAction<Category>) => {
+    addCategory(state, action: PayloadAction<Category>) {
       state.push(action.payload);
+    },
+    addTask(
+      state,
+      action: PayloadAction<{ categoryName: string; task: Task }>,
+    ) {
+      const { categoryName, task } = action.payload;
+
+      const categoryToUpdate = state.find(
+        (category: Category) => category.name === categoryName,
+      );
+      if (categoryToUpdate) {
+        categoryToUpdate.tasks = categoryToUpdate.tasks ?? [];
+        categoryToUpdate.tasks.push(task);
+      } else {
+        console.error(`Category '${categoryName}' not found`);
+      }
     },
   },
 });
 
-export const { addCategory } = categorySlice.actions;
+export const { addCategory, addTask } = categorySlice.actions;
 
 const store = configureStore({
   reducer: {

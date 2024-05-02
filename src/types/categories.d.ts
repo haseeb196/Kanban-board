@@ -1,15 +1,19 @@
-
 export interface Category {
-    name: string,
-    tasks? : Task[]
+  name: string;
+  tasks?: Task[];
 }
 
 export interface Task {
-    issue_number: string,
-    issue_date: Date,
-    issue_title: string,
-    verified: boolean,
-    severity: string,
-    description: string    
-    label: string[]
+  issue_number: string;
+  issue_date: Date;
+  issue_title: string;
+  verified: boolean;
+  severity: string;
+  description: string;
+  label: Label[];
+}
+
+export interface Label {
+  name: string;
+  color: string;
 }

@@ -22,10 +22,16 @@ export default function Home() {
   };
   const handleAddCategory = () => {
     setDialog(false);
-
-    dispatch(addCategory(addedCategory));
+    if (addedCategory.name !== "") {
+      if (
+        AllCategories.find((x) => x.name !== addedCategory.name) ??
+        AllCategories.length === 0
+      ) {
+        dispatch(addCategory(addedCategory));
+      }
+    }
   };
-  
+  console.log(AllCategories);
   return (
     <>
       <Head>
@@ -59,7 +65,8 @@ export default function Home() {
           </button>
         </div>
         <div className="flex min-h-full gap-5">
-          <Categories /> <Categories /> <Categories />
+          {AllCategories.length !== 0 &&
+            AllCategories.map((x) => <Categories name={x.name} key={x.name} tasks={x.tasks} />)}
           <div
             onClick={() => setDialog(true)}
             className="flex h-[400px]  min-w-[270px] flex-col items-center justify-center rounded-lg border-[2px] border-dashed border-gray-300 !text-gray-400"
