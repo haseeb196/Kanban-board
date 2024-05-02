@@ -1,15 +1,17 @@
 import { Add, Circle, MoreHoriz } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import Tasks from "./Tasks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TaskDialog from "./TaskDialog";
 import type { Task } from "@/types/categories";
 interface props {
   name: string;
   tasks: Task[] | undefined;
+  checkSortDate: boolean;
 }
-const Categories: React.FC<props> = ({ name, tasks }) => {
+const Categories: React.FC<props> = ({ name, tasks, checkSortDate }) => {
   const [menu, setMenu] = useState<boolean>(false);
+  const [allTask, setAllTask] = useState();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [createtask, setCreatetask] = useState<boolean>(false);
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -20,7 +22,19 @@ const Categories: React.FC<props> = ({ name, tasks }) => {
     setMenu(false);
     setAnchorEl(null);
   };
-
+  useEffect(() => {
+    setAllTask(tasks);
+  }, [tasks]);
+  useEffect(() => {
+    if (checkSortDate) {
+      const DatesortedTask = allTask?.sort(
+        (a, b) =>
+          new Date(a.issue_date).getTime() - new Date(b.issue_date).getTime(),
+      );
+      setAllTask(DatesortedTask);
+    }
+  }, [allTask, checkSortDate]);
+  console.log(allTask);
   return (
     <div className="!min-w-[270px]">
       <div className="flex items-center justify-between">
@@ -52,8 +66,8 @@ const Categories: React.FC<props> = ({ name, tasks }) => {
         </div>
       </div>
       <div className="space-y-2">
-        {tasks?.length !== 0 &&
-          tasks?.map((x: Task) => (
+        {allTask?.length !== 0 &&
+          allTask?.map((x: Task) => (
             <Tasks
               key={x.issue_title}
               issue_date={x.issue_date}

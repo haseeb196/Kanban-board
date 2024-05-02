@@ -3,10 +3,22 @@
 import Categories from "@/components/Categories";
 import { type RootState, addCategory } from "@/components/Store/store";
 import { type Category } from "@/types/categories";
-import { Add, ControlPoint, Search, SwapVert } from "@mui/icons-material";
-import { Dialog, DialogActions, DialogContent } from "@mui/material";
+import {
+  Add,
+  Check,
+  ControlPoint,
+  Search,
+  SwapVert,
+} from "@mui/icons-material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -14,6 +26,9 @@ export default function Home() {
   const [dialog, setDialog] = useState<boolean>(false);
   const dispatch = useDispatch();
   const [search, setSearch] = useState("");
+  const [sortDate, setSortDate] = useState(false);
+  const [sortMenu, setSortMenu] = useState(false);
+  const sortButtonRef = useRef<HTMLButtonElement>(null);
   const [searchedCategory, setSearchedCategory] = useState<Category[]>();
   const [addedCategory, setAddedCategory] = useState<Category>({
     name: "",
@@ -22,6 +37,10 @@ export default function Home() {
   const AllCategories = useSelector((state: RootState) => state.categories);
   const handleDialogClose = () => {
     setDialog(false);
+  };
+  const handleSortDate = () => {
+    setSortMenu(false);
+    setSortDate(!sortDate);
   };
   const handleAddCategory = () => {
     setDialog(false);
@@ -70,10 +89,37 @@ export default function Home() {
             />
           </div>
 
-          <button className="flex items-center gap-1 rounded-lg border-[1px] border-gray-200 px-3 py-[6px] text-sm font-semibold shadow-sm transition-colors hover:bg-gray-100">
-            <SwapVert fontSize="small" />
-            <span>Sort By</span>
-          </button>
+          <div className="!relative">
+            <button
+              ref={sortButtonRef}
+              onClick={() => setSortMenu(true)}
+              className="flex items-center gap-1 rounded-lg border-[1px] border-gray-200 px-3 py-[6px] text-sm font-semibold shadow-sm transition-colors hover:bg-gray-100"
+            >
+              <SwapVert fontSize="small" />
+              <span>Sort By</span>
+            </button>
+            <Menu
+              open={sortMenu}
+              anchorEl={sortButtonRef.current}
+              onClose={() => setSortMenu(false)}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <MenuItem
+                className="flex gap-1 !text-sm"
+                onClick={handleSortDate}
+              >
+                <div>By Date</div>
+                {sortDate && <Check fontSize="small" />}
+              </MenuItem>
+            </Menu>
+          </div>
           <button className="flex items-center gap-2 rounded-lg border-[1px] border-dashed border-gray-200 px-3 py-[6px] text-sm font-semibold shadow-sm transition-colors hover:bg-gray-100">
             <ControlPoint fontSize="small" />
             <span>Severity</span>
@@ -96,14 +142,22 @@ export default function Home() {
             AllCategories.map((x) => (
               <SwiperSlide key={x.name} className="!min-w-max">
                 {" "}
-                <Categories name={x.name} tasks={x.tasks} />
+                <Categories
+                  name={x.name}
+                  tasks={x.tasks}
+                  checkSortDate={sortDate}
+                />
               </SwiperSlide>
             ))
           ) : searchedCategory?.length !== 0 ? (
             searchedCategory?.map((x) => (
               <SwiperSlide key={x.name} className="!min-w-max">
                 {" "}
-                <Categories name={x.name} tasks={x.tasks} />
+                <Categories
+                  name={x.name}
+                  tasks={x.tasks}
+                  checkSortDate={sortDate}
+                />
               </SwiperSlide>
             ))
           ) : (
