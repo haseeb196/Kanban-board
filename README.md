@@ -1,29 +1,16 @@
-# Create T3 App
+# Kraftbase Frontend Engineer Assignment Submission - [Your Name]
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+## Overview
 
-## What's next? How do I make an app with this?
+This project is a kanban board application developed using React/Next.js and TypeScript. It allows users to manage tasks and categories, add labels to tasks, search, filter, and sort tasks, and authenticate users.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Installation and Setup
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+1. Clone the repository to your local machine.
+2. Install dependencies using `npm install` or `yarn install`.
+3. Run the development server using `npm run dev` or `yarn dev`.
+4. Access the application in your browser at `http://localhost:3000`.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## Conclusion
 
-## Learn More
-
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+This project was an exciting opportunity to demonstrate proficiency in frontend development while tackling real-world challenges. I thoroughly enjoyed working on this assignment and look forward to any feedback or further discussions.
