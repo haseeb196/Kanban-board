@@ -14,3 +14,8 @@ This project is a kanban board application developed using React/Next.js and Typ
 ## Conclusion
 
 This project was an exciting opportunity to demonstrate proficiency in frontend development while tackling real-world challenges. I thoroughly enjoyed working on this assignment and look forward to any feedback or further discussions.
+
+## special Note
+1.I didn't add the drag and drop feature, and perhaps it's not responsive for smaller devices because I didn't have much time for the task submission.
+2. label feature only work with severity and not for custom labels, but u can add custom labels and status button doesn't work 
+3. all other features are implemented
