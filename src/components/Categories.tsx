@@ -8,12 +8,49 @@ interface props {
   name: string;
   tasks: Task[] | undefined;
   checkSortDate: boolean;
+  checkSortSeverity: string;
 }
-const Categories: React.FC<props> = ({ name, tasks, checkSortDate }) => {
+const Categories: React.FC<props> = ({
+  checkSortSeverity,
+  name,
+  tasks,
+  checkSortDate,
+}) => {
   const [menu, setMenu] = useState<boolean>(false);
-  const [allTask, setAllTask] = useState();
+  const [allTask, setAllTask] = useState<Task[] | undefined>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [createtask, setCreatetask] = useState<boolean>(false);
+  useEffect(() => {
+    return setAllTask(tasks);
+  }, [tasks]);
+  useEffect(() => {
+    if (tasks?.length !== 0 && tasks) {
+      if (checkSortDate) {
+        const DatesortedTask = [...tasks]?.sort(
+          (a, b) =>
+            new Date(b.issue_date).getTime() - new Date(a.issue_date).getTime(),
+        );
+        setAllTask(DatesortedTask);
+      } else {
+        setAllTask(tasks);
+      }
+    }
+  }, [checkSortDate, tasks]);
+  useEffect(() => {
+    if (tasks?.length !== 0 && tasks) {
+      if (checkSortSeverity !== "All") {
+        setAllTask(tasks.filter((x) => x.severity === checkSortSeverity));
+      } else {
+        setAllTask(tasks);
+      }
+    }
+  }, [tasks, checkSortSeverity]);
+  const handleEditCategory = () => {
+    //Edit Category
+  };
+  const handleDeleteCategory = () => {
+// Delete Category
+  }
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenu(true);
     setAnchorEl(event.currentTarget);
@@ -22,19 +59,6 @@ const Categories: React.FC<props> = ({ name, tasks, checkSortDate }) => {
     setMenu(false);
     setAnchorEl(null);
   };
-  useEffect(() => {
-    setAllTask(tasks);
-  }, [tasks]);
-  useEffect(() => {
-    if (checkSortDate) {
-      const DatesortedTask = allTask?.sort(
-        (a, b) =>
-          new Date(a.issue_date).getTime() - new Date(b.issue_date).getTime(),
-      );
-      setAllTask(DatesortedTask);
-    }
-  }, [allTask, checkSortDate]);
-  console.log(allTask);
   return (
     <div className="!min-w-[270px]">
       <div className="flex items-center justify-between">
@@ -51,8 +75,10 @@ const Categories: React.FC<props> = ({ name, tasks, checkSortDate }) => {
               <MoreHoriz fontSize="small" />
             </IconButton>
             <Menu open={menu} onClose={handleMenuClose} anchorEl={anchorEl}>
-              <MenuItem className="!text-[12px]">Edit Category</MenuItem>
-              <MenuItem className="!text-[12px]">Remove Category</MenuItem>
+              <MenuItem className="!text-[12px]" onClick={handleEditCategory}>
+                Edit Category
+              </MenuItem>
+              <MenuItem className="!text-[12px]" onClick={handleDeleteCategory}>Remove Category</MenuItem>
             </Menu>
           </div>
           <IconButton onClick={() => setCreatetask(true)}>

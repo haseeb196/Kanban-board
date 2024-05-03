@@ -26,9 +26,12 @@ export default function Home() {
   const [dialog, setDialog] = useState<boolean>(false);
   const dispatch = useDispatch();
   const [search, setSearch] = useState("");
+  const [sortSeverity, setSortSeverity] = useState("All");
   const [sortDate, setSortDate] = useState(false);
   const [sortMenu, setSortMenu] = useState(false);
-  const sortButtonRef = useRef<HTMLButtonElement>(null);
+  const sortMenuRef = useRef<HTMLButtonElement>(null);
+  const sortSeverityRef = useRef<HTMLButtonElement>(null);
+  const [sortSeverityMenu, setSortSeverityMenu] = useState(false);
   const [searchedCategory, setSearchedCategory] = useState<Category[]>();
   const [addedCategory, setAddedCategory] = useState<Category>({
     name: "",
@@ -41,6 +44,10 @@ export default function Home() {
   const handleSortDate = () => {
     setSortMenu(false);
     setSortDate(!sortDate);
+  };
+  const handleSortSeverity = (severity: string) => {
+    setSortSeverityMenu(!sortSeverityMenu);
+    setSortSeverity(severity);
   };
   const handleAddCategory = () => {
     setDialog(false);
@@ -68,6 +75,7 @@ export default function Home() {
       setSearchedCategory(filterCategory);
     }
   }, [AllCategories, search]);
+
   return (
     <>
       <Head>
@@ -91,7 +99,7 @@ export default function Home() {
 
           <div className="!relative">
             <button
-              ref={sortButtonRef}
+              ref={sortMenuRef}
               onClick={() => setSortMenu(true)}
               className="flex items-center gap-1 rounded-lg border-[1px] border-gray-200 px-3 py-[6px] text-sm font-semibold shadow-sm transition-colors hover:bg-gray-100"
             >
@@ -100,7 +108,7 @@ export default function Home() {
             </button>
             <Menu
               open={sortMenu}
-              anchorEl={sortButtonRef.current}
+              anchorEl={sortMenuRef.current}
               onClose={() => setSortMenu(false)}
               anchorOrigin={{
                 vertical: "bottom",
@@ -120,10 +128,40 @@ export default function Home() {
               </MenuItem>
             </Menu>
           </div>
-          <button className="flex items-center gap-2 rounded-lg border-[1px] border-dashed border-gray-200 px-3 py-[6px] text-sm font-semibold shadow-sm transition-colors hover:bg-gray-100">
-            <ControlPoint fontSize="small" />
-            <span>Severity</span>
-          </button>
+          <div>
+            <button
+              onClick={() => setSortSeverityMenu(true)}
+              ref={sortSeverityRef}
+              className="flex items-center gap-2 rounded-lg border-[1px] border-dashed border-gray-200 px-3 py-[6px] text-sm font-semibold shadow-sm transition-colors hover:bg-gray-100"
+            >
+              <ControlPoint fontSize="small" />
+              <span>Severity</span>{" "}
+            </button>
+            <Menu
+              open={sortSeverityMenu}
+              anchorEl={sortSeverityRef.current}
+              onClose={() => setSortSeverityMenu(false)}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              {["All", "low", "medium", "high", "critical"].map((x) => (
+                <MenuItem
+                  key={x}
+                  onClick={() => handleSortSeverity(x)}
+                  className="!flex !items-center !gap-x-2"
+                >
+                  <span>{x}</span>
+                  {sortSeverity === x && <Check fontSize="small" />}
+                </MenuItem>
+              ))}
+            </Menu>
+          </div>
           <button className="flex items-center gap-2 rounded-lg border-[1px] border-dashed border-gray-200 px-3 py-[6px] text-sm font-semibold shadow-sm transition-colors hover:bg-gray-100">
             <ControlPoint fontSize="small" />
             <span>Status</span>
@@ -146,6 +184,7 @@ export default function Home() {
                   name={x.name}
                   tasks={x.tasks}
                   checkSortDate={sortDate}
+                   checkSortSeverity={sortSeverity}
                 />
               </SwiperSlide>
             ))
@@ -157,6 +196,7 @@ export default function Home() {
                   name={x.name}
                   tasks={x.tasks}
                   checkSortDate={sortDate}
+                  checkSortSeverity={sortSeverity}
                 />
               </SwiperSlide>
             ))
