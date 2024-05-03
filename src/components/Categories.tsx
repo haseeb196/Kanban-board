@@ -3,7 +3,10 @@ import { IconButton, Menu, MenuItem } from "@mui/material";
 import Tasks from "./Tasks";
 import { useEffect, useState } from "react";
 import TaskDialog from "./TaskDialog";
-import type { Task } from "@/types/categories";
+import type { Category, Task } from "@/types/categories";
+import { useDispatch } from "react-redux";
+import { EditCategory, deleteCategory } from "./Store/store";
+import AddCategoryDialog from "./AddCategoryDialog";
 interface props {
   name: string;
   tasks: Task[] | undefined;
@@ -17,12 +20,16 @@ const Categories: React.FC<props> = ({
   checkSortDate,
 }) => {
   const [menu, setMenu] = useState<boolean>(false);
+  const Dispatch = useDispatch();
   const [allTask, setAllTask] = useState<Task[] | undefined>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [createtask, setCreatetask] = useState<boolean>(false);
+  const [createtask, setCreatetask] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editCategory, setEditCategory] = useState<Category>({ name: name });
   useEffect(() => {
     return setAllTask(tasks);
   }, [tasks]);
+
   useEffect(() => {
     if (tasks?.length !== 0 && tasks) {
       if (checkSortDate) {
@@ -46,11 +53,15 @@ const Categories: React.FC<props> = ({
     }
   }, [tasks, checkSortSeverity]);
   const handleEditCategory = () => {
-    //Edit Category
+    if (editCategory.name !== "") {
+      Dispatch(EditCategory({ OldCategoryName: name, NewCategoryName: editCategory.name }));
+      setOpenDialog(false);
+    }
   };
   const handleDeleteCategory = () => {
-// Delete Category
-  }
+    Dispatch(deleteCategory({ CategoryName: name }));
+    setMenu(false);
+  };
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenu(true);
     setAnchorEl(event.currentTarget);
@@ -59,6 +70,7 @@ const Categories: React.FC<props> = ({
     setMenu(false);
     setAnchorEl(null);
   };
+
   return (
     <div className="!min-w-[270px]">
       <div className="flex items-center justify-between">
@@ -75,11 +87,23 @@ const Categories: React.FC<props> = ({
               <MoreHoriz fontSize="small" />
             </IconButton>
             <Menu open={menu} onClose={handleMenuClose} anchorEl={anchorEl}>
-              <MenuItem className="!text-[12px]" onClick={handleEditCategory}>
+              <MenuItem
+                className="!text-[12px]"
+                onClick={() => setOpenDialog(true)}
+              >
                 Edit Category
               </MenuItem>
-              <MenuItem className="!text-[12px]" onClick={handleDeleteCategory}>Remove Category</MenuItem>
+              <MenuItem className="!text-[12px]" onClick={handleDeleteCategory}>
+                Remove Category
+              </MenuItem>
             </Menu>
+            <AddCategoryDialog
+              open={openDialog}
+              setOpen={setOpenDialog}
+              onClick={handleEditCategory}
+              value={editCategory?.name}
+              setValue={setEditCategory}
+            />
           </div>
           <IconButton onClick={() => setCreatetask(true)}>
             <Add fontSize="small" />
@@ -96,13 +120,14 @@ const Categories: React.FC<props> = ({
           allTask?.map((x: Task) => (
             <Tasks
               key={x.issue_title}
-              issue_date={x.issue_date}
+            issue_date={x.issue_date}
               issue_number={x.issue_number}
               issue_title={x.issue_title}
               description={x.description}
               severity={x.severity}
               verified={x.verified}
               label={x.label}
+            categoryName={name}
             />
           ))}
       </div>

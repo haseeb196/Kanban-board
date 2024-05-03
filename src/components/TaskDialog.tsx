@@ -1,4 +1,4 @@
-import type { Label } from "@/types/categories";
+import type { Label, Task } from "@/types/categories";
 import { Close } from "@mui/icons-material";
 import { Dialog, DialogTitle } from "@mui/material";
 import React, {
@@ -10,18 +10,19 @@ import React, {
   useRef,
 } from "react";
 import { useDispatch } from "react-redux";
-import { addTask } from "./Store/store";
+import { EditEachTask, addTask } from "./Store/store";
 interface props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   CategoryName: string;
+  task?: Task;
 }
 export const LabelcolorVariant = {
   blue: "bg-blue-300 border-blue-500 text-blue-900",
   purple: "bg-purple-300 border-purple-500 text-purple-900",
   green: "bg-green-300 border-green-500 text-green-900",
 };
-const TaskDialog: FC<props> = ({ open, setOpen, CategoryName }) => {
+const TaskDialog: FC<props> = ({ open, setOpen, CategoryName, task }) => {
   const [selectedLabelColor, setSelectedLabelColor] = useState<string>("green");
   const [label, setLabel] = useState<string>("");
   const Dispatch = useDispatch();
@@ -50,28 +51,59 @@ const TaskDialog: FC<props> = ({ open, setOpen, CategoryName }) => {
       }
     };
   }, [setLabelError, label]);
+  useEffect(() => {
+    if (task !== undefined) {
+      setSeverity(task.severity);
+      setAllLabels(task.label);
+      setDescription(task.description);
+      setTitle(task.issue_title);
+    }
+  }, [task]);
   const handleTask = () => {
-    if (title !== "" && description !== "") {
-      const newTask = {
-        issue_number: Math.floor(Math.random() * 1000).toString(),
-        issue_date: new Intl.DateTimeFormat("en-US", {
-          day: "numeric",
-          month: "short",
-          hour: "numeric",
-          minute: "numeric",
-          hour12: true,
-        }).format(new Date()),
-        issue_title: title,
-        verified: true,
-        severity: severity,
-        description: description,
-        label: allLabels,
-      };
-      Dispatch(addTask({ checkCategory: CategoryName, task: newTask }));
-      setOpen(false);
-      setDescription("");
-      setTitle("");
-      setAllLabels([]);
+    if (task === undefined) {
+      if (title !== "" && description !== "") {
+        const newTask = {
+          issue_number: Math.floor(Math.random() * 1000).toString(),
+          issue_date: new Intl.DateTimeFormat("en-US", {
+            day: "numeric",
+            month: "short",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+          }).format(new Date()),
+          issue_title: title,
+          verified: true,
+          severity: severity,
+          description: description,
+          label: allLabels,
+          categoryName: CategoryName,
+        };
+        Dispatch(addTask({ checkCategory: CategoryName, task: newTask }));
+        setOpen(false);
+        setDescription("");
+        setTitle("");
+        setAllLabels([]);
+      }
+    } else {
+      if (
+        title !== task.issue_title ||
+        severity !== task.severity ||
+        allLabels !== task.label ||
+        description !== task.description
+      ) {
+        const EditTask = {
+          issue_number: task.issue_number,
+          issue_date: task.issue_date,
+          issue_title: title,
+          verified: true,
+          severity: severity,
+          description: description,
+          label: allLabels,
+          categoryName: CategoryName,
+        };
+        Dispatch(EditEachTask({ task: EditTask }));
+        setOpen(false);
+      }
     }
   };
 
@@ -99,7 +131,9 @@ const TaskDialog: FC<props> = ({ open, setOpen, CategoryName }) => {
 
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
-      <DialogTitle>Create Task</DialogTitle>
+      <DialogTitle>
+        {task === undefined ? "Create Task" : "Edit Task"}
+      </DialogTitle>
       <div className="flex w-[450px] flex-col gap-2 px-4 pb-4">
         <label htmlFor="title">
           Title<span className="text-red-600">*</span>:
@@ -221,7 +255,7 @@ const TaskDialog: FC<props> = ({ open, setOpen, CategoryName }) => {
           className="self-end rounded-lg bg-sky-400 px-2 py-1"
           onClick={handleTask}
         >
-          Create
+          {task === undefined ? "Create" : "Edit"}
         </button>
       </div>
     </Dialog>

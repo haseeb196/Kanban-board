@@ -1,5 +1,6 @@
+import type { Category } from "./../../types/categories.d";
 // store.ts
-import type { Category, Task } from "@/types/categories";
+import type { Task } from "@/types/categories";
 import {
   configureStore,
   createSlice,
@@ -29,10 +30,59 @@ const categorySlice = createSlice({
         categoryToUpdate.tasks.push(task);
       }
     },
+    deleteCategory(state, action: PayloadAction<{ CategoryName: string }>) {
+      const { CategoryName } = action.payload;
+      return state.filter((x) => x.name !== CategoryName);
+    },
+    EditCategory(
+      state,
+      action: PayloadAction<{
+        OldCategoryName: string;
+        NewCategoryName: string;
+      }>,
+    ) {
+      const { OldCategoryName, NewCategoryName } = action.payload;
+      const CategoryToEdit = state.find(
+        (category: Category) => category.name === OldCategoryName,
+      );
+      if (CategoryToEdit) {
+        CategoryToEdit.name = NewCategoryName;
+      }
+    },
+    DeleteTask(
+      state,
+      action: PayloadAction<{ Category: string; Task: string }>,
+    ) {
+      const { Category, Task } = action.payload;
+      const TaskToDelete = state.find((category) => category.name === Category);
+      if (TaskToDelete) {
+        TaskToDelete.tasks = TaskToDelete.tasks?.filter(
+          (x) => x.issue_title !== Task,
+        );
+      }
+    },
+    EditEachTask(state, action: PayloadAction<{ task: Task }>) {
+      const { task } = action.payload;
+      const FindCategory = state.find(
+        (category) => category.name === task.categoryName,
+      );
+      if (FindCategory) {
+        FindCategory.tasks = FindCategory.tasks?.map((x) =>
+          x.issue_number === task.issue_number ? task : x,
+        );
+      }
+    },
   },
 });
 
-export const { addCategory, addTask } = categorySlice.actions;
+export const {
+  addCategory,
+  addTask,
+  deleteCategory,
+  EditCategory,
+  DeleteTask,
+  EditEachTask,
+} = categorySlice.actions;
 
 const store = configureStore({
   reducer: {

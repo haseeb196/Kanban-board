@@ -11,6 +11,7 @@ export interface Task {
   severity: string;
   description: string;
   label: Label[];
+  categoryName: string
 }
 
 export interface Label {

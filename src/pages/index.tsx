@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+import AddCategoryDialog from "@/components/AddCategoryDialog";
 import Categories from "@/components/Categories";
 import { type RootState, addCategory } from "@/components/Store/store";
 import { type Category } from "@/types/categories";
@@ -7,6 +8,7 @@ import {
   Add,
   Check,
   ControlPoint,
+  DialpadOutlined,
   Search,
   SwapVert,
 } from "@mui/icons-material";
@@ -38,30 +40,6 @@ export default function Home() {
     tasks: [],
   });
   const AllCategories = useSelector((state: RootState) => state.categories);
-  const handleDialogClose = () => {
-    setDialog(false);
-  };
-  const handleSortDate = () => {
-    setSortMenu(false);
-    setSortDate(!sortDate);
-  };
-  const handleSortSeverity = (severity: string) => {
-    setSortSeverityMenu(!sortSeverityMenu);
-    setSortSeverity(severity);
-  };
-  const handleAddCategory = () => {
-    setDialog(false);
-    if (addedCategory.name !== "") {
-      if (
-        !AllCategories.find((x) => x.name === addedCategory.name) ||
-        AllCategories.length === 0
-      ) {
-        dispatch(addCategory(addedCategory));
-        setAddedCategory({ name: "", tasks: [] });
-      }
-    }
-    setAddedCategory({ name: "", tasks: [] });
-  };
   useEffect(() => {
     if (search !== "") {
       const categoryMatchesSearch = (category: Category) => {
@@ -75,6 +53,33 @@ export default function Home() {
       setSearchedCategory(filterCategory);
     }
   }, [AllCategories, search]);
+
+  const handleDialogClose = () => {
+    setDialog(false);
+  };
+  const handleSortDate = () => {
+    setSortMenu(false);
+    setSortDate(!sortDate);
+  };
+  const handleSortSeverity = (severity: string) => {
+    setSortSeverityMenu(!sortSeverityMenu);
+    setSortSeverity(severity);
+  };
+  const handleAddCategory = () => {
+    setDialog(false);
+
+    if (addedCategory.name !== "") {
+      if (
+        AllCategories.length === 0 ||
+        AllCategories.find(
+          (x) => x.name.toLowerCase() === addedCategory.name.toLowerCase(),
+        ) === undefined
+      ) {
+        dispatch(addCategory(addedCategory));
+        setAddedCategory({ name: "", tasks: [] });
+      }
+    }
+  };
 
   return (
     <>
@@ -184,7 +189,7 @@ export default function Home() {
                   name={x.name}
                   tasks={x.tasks}
                   checkSortDate={sortDate}
-                   checkSortSeverity={sortSeverity}
+                  checkSortSeverity={sortSeverity}
                 />
               </SwiperSlide>
             ))
@@ -212,29 +217,13 @@ export default function Home() {
               <p>Add a Category</p>
             </div>
           </SwiperSlide>
-          <Dialog open={dialog} onClose={handleDialogClose}>
-            <DialogContent>
-              <div className="flex flex-col gap-2">
-                <label htmlFor="category-name">Category Name:</label>
-                <input
-                  type="text"
-                  id="category-name"
-                  className="rounded-md border-[1px] border-gray-400 px-1 outline-none"
-                  placeholder="Enter Name"
-                  value={addedCategory.name}
-                  onChange={(e) => setAddedCategory({ name: e.target.value })}
-                />
-              </div>
-              <DialogActions>
-                <button
-                  className="rounded-md bg-sky-400 px-2 py-1"
-                  onClick={handleAddCategory}
-                >
-                  Done
-                </button>
-              </DialogActions>
-            </DialogContent>
-          </Dialog>
+          <AddCategoryDialog
+            open={dialog}
+            setOpen={setDialog}
+            onClick={handleAddCategory}
+            value={addedCategory.name}
+            setValue={setAddedCategory}
+          />
         </Swiper>
       </main>
     </>
