@@ -2,24 +2,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import AddCategoryDialog from "@/components/AddCategoryDialog";
 import Categories from "@/components/Categories";
+import LoginPage from "@/components/LoginPage";
+import { logout, type UserRootState } from "@/components/Store/UserStore";
 import { type RootState, addCategory } from "@/components/Store/store";
 import { type Category } from "@/types/categories";
 import {
   Add,
   Check,
   ControlPoint,
-  DialpadOutlined,
   Search,
   SwapVert,
 } from "@mui/icons-material";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Menu,
-  MenuItem,
-} from "@mui/material";
+import { Avatar, Menu, MenuItem } from "@mui/material";
 import Head from "next/head";
+
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -35,11 +31,14 @@ export default function Home() {
   const sortSeverityRef = useRef<HTMLButtonElement>(null);
   const [sortSeverityMenu, setSortSeverityMenu] = useState(false);
   const [searchedCategory, setSearchedCategory] = useState<Category[]>();
+  const [logoutMenu, setLogoutMenu] = useState(false);
+  const logoutRef = useRef(null);
   const [addedCategory, setAddedCategory] = useState<Category>({
     name: "",
     tasks: [],
   });
   const AllCategories = useSelector((state: RootState) => state.categories);
+  const Checklogin = useSelector((state: UserRootState) => state?.user);
   useEffect(() => {
     if (search !== "") {
       const categoryMatchesSearch = (category: Category) => {
@@ -54,9 +53,6 @@ export default function Home() {
     }
   }, [AllCategories, search]);
 
-  const handleDialogClose = () => {
-    setDialog(false);
-  };
   const handleSortDate = () => {
     setSortMenu(false);
     setSortDate(!sortDate);
@@ -80,8 +76,15 @@ export default function Home() {
       }
     }
   };
-
-  return (
+  const handleLogout = () => {
+    setLogoutMenu(false);
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ loggedIn: false, username: null, password: null }),
+    );
+    dispatch(logout());
+  };
+  return Checklogin?.loggedIn ? (
     <>
       <Head>
         <title>kanban-board</title>
@@ -89,7 +92,29 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="min-h-screen space-y-5 !overflow-x-hidden p-5">
-        <h1 className="text-3xl font-semibold">Vulnerabilities</h1>
+        <div className="flex justify-between">
+          <h1 className="text-3xl font-semibold">Vulnerabilities</h1>
+          <div ref={logoutRef}>
+            <Avatar className="!h-8 !w-8" onClick={() => setLogoutMenu(true)} />
+            <Menu
+              open={logoutMenu}
+              onClose={() => setLogoutMenu(false)}
+              anchorEl={logoutRef.current}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              <MenuItem className="!text-sm" onClick={handleLogout}>
+                Logout
+              </MenuItem>
+            </Menu>
+          </div>
+        </div>
         <div className="flex gap-2">
           <div className="flex items-center gap-2 rounded-lg border-[1px] border-gray-200 px-3 py-[6px] text-sm font-semibold shadow-sm">
             <Search fontSize="small" />
@@ -227,5 +252,7 @@ export default function Home() {
         </Swiper>
       </main>
     </>
+  ) : (
+    <LoginPage />
   );
 }
